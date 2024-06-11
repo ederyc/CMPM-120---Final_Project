@@ -17,7 +17,7 @@ class Platformer extends Phaser.Scene {
         this.isReloading = false; // Track if reloading is in progress
         this.BEE_SPEED = 200;
         this.BEE_MOVEMENT_RANGE = 20; // Range in pixels above and below the spawn point
-        this.playerHeatlh = 3;
+        this.playerHeatlh = 100;
         this.lastStepTime = 0; //track the time of the last step
 
 
@@ -102,6 +102,12 @@ class Platformer extends Phaser.Scene {
             fill: '#ffffff'
         });
 
+        //health text
+        this.healthText = this.add.text(0, 20, `HEALTH: ${this.playerHeatlh}`, {
+            font: '18px Arial',
+            fill: '#ffffff'
+        });
+
 
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(20, 200, "tile_0040.png");
@@ -122,11 +128,10 @@ class Platformer extends Phaser.Scene {
         // Handle collision detection with coins
  
 
-        //handle collisions between players and bees
-        this.physics.add.overlap(my.sprite.player, this.bees, this.playerHitByBee, null, this);
+
 
         //handle collisions between bullets and bees
-        this.physics.add.overlap(this.bullets, this.bees, this.beeHitByBullet, null, this);
+        this.physics.add.collider(my.sprite.player, this.bees, this.playerHitByBee, null, this);
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -280,6 +285,7 @@ class Platformer extends Phaser.Scene {
         const textPositionX = camera.worldView.x; // 10 pixels from the left edge of the camera's visible area
         const textPositionY = camera.worldView.y; // 10 pixels from the top edge of the camera's visible area
         this.bulletText.setPosition(textPositionX, textPositionY);
+        this.healthText.setPosition(textPositionX, textPositionY + 20);
     }
 
    
@@ -306,7 +312,29 @@ class Platformer extends Phaser.Scene {
     }
 
     playerHitByBee(player, bee) {
-        console.log('Player hit by bee!');
+        this.playerHeatlh -= 20;
+        this.updateHealthText();
+
+        let knockbackDirection = player.x < bee.x ? -1 : 1;
+
+        player.setVelocityX(knockbackDirection * 300);
+        player.setVelocityY(-200);
+
+        this.tweens.add({
+            targets: player,
+            alpha: 0,
+            duration: 100,
+            ease: 'Linear',
+            yoyo: true,
+            repeat: 5,
+            onComplete: () => {
+                player.alpha = 1;
+            }
+        });
+        
+        if (this.playerHealth <= 0) {
+            this.gameOver();
+        }
     }
 
     beeHitByBullet(bullet, bee) {
@@ -316,9 +344,7 @@ class Platformer extends Phaser.Scene {
         console.log('Bee hit by bullet!');
     }
 
-    playerHitByBee(player, bee) {
-        this.playerHeatlh--;
-    }
+
 
     shootBullet() {
         if (this.bulletsLeft > 0) { // Check if bullets are available
@@ -360,6 +386,10 @@ class Platformer extends Phaser.Scene {
             this.isReloading = false;
             this.bulletText.setText(`BULLETS X ${this.bulletsLeft}`);
         }, null, this);
+    }
+
+    updateHealthText() {
+        this.healthText.setText(`HEALTH: ${this.playerHeatlh}`);
     }
 
     updateBulletText() {
