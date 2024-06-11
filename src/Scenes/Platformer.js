@@ -43,16 +43,26 @@ class Platformer extends Phaser.Scene {
         this.tileset_food = this.map.addTilesetImage("food_tilemap", "food_tiles");
         this.tileset_other = this.map.addTilesetImage("bonnie_tilemap_packed", "other_tilemap_tiles");
         this.tileset_skyOver = this.map.addTilesetImage("bonnie_overlay", "other_tilemap_tiles");
+        this.tileset_middleground = this.map.addTilesetImage("bonnie_overlay", "other_tilemap_tiles");
+        this.tileset_foreground = this.map.addTilesetImage("bonnie_overlay", "other_tilemap_tiles");
+
+
 
         // Create a layer
         this.skyLayer = this.map.createLayer("Sky", this.tileset_other, 0, 0);
         this.skyOverLayer = this.map.createLayer("Over-Sky", this.tileset_skyOver, 0, 0);
+        this.middlegroundLayer = this.map.createLayer("MiddleGround", this.tileset_middleground, 0, 0);
+        this.foregroundLayer = this.map.createLayer("ForeGround", this.tileset_foreground, 0, 0);
         this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset_food, 0, 0);
 
         this.skyLayer.setScrollFactor(0);
         this.skyLayer.setPosition(0, 225);
         this.skyOverLayer.setScrollFactor(0);
         this.skyOverLayer.setPosition(0, 225);
+        this.middlegroundLayer.setScrollFactor(0.5);
+        this.middlegroundLayer.setPosition(25, 114);
+        this.foregroundLayer.setScrollFactor(0.2);
+        this.foregroundLayer.setPosition(25, 181);
 
         
 
@@ -146,7 +156,7 @@ class Platformer extends Phaser.Scene {
 
         // TODO: add camera code here
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-        this.cameras.main.startFollow(my.sprite.player, true, 0.1, 0.1); // (target, [,roundPixels][,lerpX][,lerpY])
+        this.cameras.main.startFollow(my.sprite.player, true, 0.9, 0.9); // (target, [,roundPixels][,lerpX][,lerpY])
         this.cameras.main.setDeadzone(50, 50);
         this.cameras.main.setZoom(this.SCALE);
 
@@ -225,6 +235,9 @@ class Platformer extends Phaser.Scene {
         // Reload mechanic
         if (Phaser.Input.Keyboard.JustDown(this.reloadKey) && !this.isReloading) {
             this.reloadBullets();
+            this.sound.play("reload", {
+                volume: 0.3
+            });
         }
 
         // Shooting mechanic

@@ -13,7 +13,7 @@
         }
     },
     "last.exportedFilePath": "/Users/ederyepez/Documents/CMPM 120/Final_Project/assets",
-    "last.imagePath": "/Users/ederyepez/Documents/CMPM 120/Project 3/kenney_pixel-line-platformer/Tilemap",
+    "last.imagePath": "/Users/ederyepez/Documents/CMPM 120/Final Project/kenney_pixel-platformer/Tilemap",
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
     "map.lastUsedFormat": "json",
     "map.tileHeight": 18,
@@ -27,7 +27,7 @@
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
-        "height": 16,
-        "width": 16
+        "height": 18,
+        "width": 18
     }
 }

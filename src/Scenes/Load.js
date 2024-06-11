@@ -13,6 +13,7 @@ class Load extends Phaser.Scene {
         this.load.audio("jump", "cartoon_jump.wav");
         this.load.audio("step", "walk.mp3");
         this.load.audio("shoot", "friendly_shoot.wav");
+        this.load.audio("reload", "reload.mp3");
         this.load.image("initial_bee", "tile_0051.png");
         this.load.image("flying_bee", "tile_0052.png");
         this.load.image("initial_shot", "tile_0043.png");
@@ -22,7 +23,9 @@ class Load extends Phaser.Scene {
         this.load.image("stop_walk", "tile_0042.png");
         this.load.image("food_tiles", "tilemap_packed.png"); // Packed tilemap
         this.load.image("other_tilemap_tiles", "bonnie_tilemap_packed.png");
-        this.load.image("cloud_tiles", "bonnie_tilemap_packed.png")
+        this.load.image("cloud_tiles", "bonnie_tilemap_packed.png");
+        this.load.image("middleground_tiles", "bonnie_tilemap_packed.png");
+        this.load.image("foreground_tiles", "bonnie_tilemap_packed.png");
         this.load.tilemapTiledJSON("Food_Wars", "food_map.tmj");   // Tilemap in JSON
 
         // Load the tilemap as a spritesheet
