@@ -1,0 +1,33 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Bonnie's-Bullets.tmj",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "Bonnie's-Bullets.tmj": {
+            "scale": 0.4228819444444444,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 722.423844322194,
+                "y": 160.80137942359806
+            }
+        },
+        "Bonnie's-Bullets.tmj#Bonnie-Assets": {
+            "scaleInDock": 1
+        },
+        "Bonnie's-Bullets.tmj#farm-n-stuff": {
+            "scaleInDock": 1
+        }
+    },
+    "openFiles": [
+        "Bonnie's-Bullets.tmj"
+    ],
+    "project": "untitled.tiled-project",
+    "recentFiles": [
+        "Bonnie's-Bullets.tmj"
+    ]
+}
