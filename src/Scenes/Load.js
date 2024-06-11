@@ -10,7 +10,8 @@ class Load extends Phaser.Scene {
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
 
         // Load tilemap information
-        this.load.audio("jump", "jump.wav");
+        this.load.audio("jump", "cartoon_jump.wav");
+        this.load.audio("step", "walk.mp3");
         this.load.audio("shoot", "friendly_shoot.wav");
         this.load.image("initial_bee", "tile_0051.png");
         this.load.image("flying_bee", "tile_0052.png");

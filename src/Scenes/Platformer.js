@@ -18,6 +18,7 @@ class Platformer extends Phaser.Scene {
         this.BEE_SPEED = 200;
         this.BEE_MOVEMENT_RANGE = 20; // Range in pixels above and below the spawn point
         this.playerHeatlh = 3;
+        this.lastStepTime = 0; //track the time of the last step
 
 
         // Define bee spawn positions
@@ -52,6 +53,7 @@ class Platformer extends Phaser.Scene {
         this.skyLayer.setPosition(0, 225);
         this.skyOverLayer.setScrollFactor(0);
         this.skyOverLayer.setPosition(0, 225);
+
         
 
         // Make it collidable
@@ -155,6 +157,7 @@ class Platformer extends Phaser.Scene {
     }
 
     update() {
+        const currentTime = this.time.now;
         if (cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
@@ -166,6 +169,12 @@ class Platformer extends Phaser.Scene {
             // Only play smoke effect if touching the ground
             if (my.sprite.player.body.blocked.down) {
                 my.vfx.walking.start();
+                if (currentTime - this.lastStepTime > 400) {
+                    this.sound.play("step", {
+                        volume : 1
+                    });
+                    this.lastStepTime = currentTime;
+                }
             }
 
         } else if (cursors.right.isDown) {
@@ -175,6 +184,17 @@ class Platformer extends Phaser.Scene {
             // TODO: add particle following code here
             my.vfx.walking.startFollow(my.sprite.player, my.sprite.player.displayWidth / 2 - 10, my.sprite.player.displayHeight / 2 - 5, false);
             my.vfx.walking.setParticleSpeed(this.PARTICLE_VELOCITY, 0);
+
+            // Only play smoke effect if touching the ground
+            if (my.sprite.player.body.blocked.down) {
+                my.vfx.walking.start();
+                if (currentTime - this.lastStepTime > 100) {
+                    this.sound.play("step", {
+                        volume : 1
+                    });
+                    this.lastStepTime = currentTime;
+                }
+            }
 
         } else {
             // Set acceleration to 0 and have DRAG take over
@@ -193,7 +213,7 @@ class Platformer extends Phaser.Scene {
         if (my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
             my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             this.sound.play("jump", {
-                volume: 1
+                volume: 0.7
             });
         }
 
