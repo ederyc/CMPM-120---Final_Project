@@ -15,6 +15,8 @@ class Load extends Phaser.Scene {
         this.load.audio("shoot", "friendly_shoot.wav");
         this.load.audio("reload", "reload.mp3");
         this.load.image("initial_bee", "tile_0051.png");
+        this.load.image("eButton", "tile_0087.png")
+        this.load.image("snowman", "tile_0145.png")
         this.load.image("flying_bee", "tile_0052.png");
         this.load.image("initial_shot", "tile_0043.png");
         this.load.image("bullet", "tile_0044.png")

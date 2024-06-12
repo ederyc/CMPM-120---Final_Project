@@ -83,19 +83,6 @@ class Platformer extends Phaser.Scene {
             frame: 90
         });
 
-        // TODO: Add turn into Arcade Physics here
-        // Since createFromObjects returns an array of regular Sprites, we need to convert 
-        // them into Arcade Physics sprites (STATIC_BODY, so they don't move) 
-
-
-
-        // Create a Phaser group out of the array this.coins
-        // This will be used for collision detection below.
-
-         // Handle collision detection with coins
-
-
-
         // Bullet group
         this.bullets = this.physics.add.group({
             defaultKey: 'bullet',
@@ -105,8 +92,14 @@ class Platformer extends Phaser.Scene {
             }
         });
 
+        this.snowman = this.physics.add.sprite(100, 250, 'snowman');
+    this.snowman.setInteractive();
+    this.physics.add.collider(this.snowman, this.groundLayer);
+
         // Set the initial bullets left value
         this.bulletsLeft = this.MAX_BULLETS;
+
+   
 
         // Create the text object for bullets left
         this.bulletText = this.add.text(0, 0, `BULLETS X ${this.bulletsLeft}`, {
@@ -119,6 +112,37 @@ class Platformer extends Phaser.Scene {
             font: '18px Arial',
             fill: '#ffffff'
         });
+
+        //ePrompt handler
+        this.eButtonPrompt = this.add.sprite(this.snowman.x + 1, this.snowman.y - 5, 'eButton');
+        this.eButtonPrompt.setOrigin(0.5);
+
+        this.tweens.add({
+            targets: this.eButtonPrompt,
+            scale: 1.8, // Scale factor for pulsation
+            duration: 250, // Duration for scaling up
+            yoyo: true, // Play the tween in reverse (scaling down)
+            repeat: -1 // Repeat indefinitely
+        });
+
+
+
+        this.textBox = this.add.text(this.snowman.x, this.snowman.y - 20, 'Get to the birthday Cake!\nMove with the arrow keys\nPress SPACE to shoot\nPress F to reload\nPress R to restart\nCollect BURGERS to regain health\nOther types of food grant power-ups\nPress H to hide this message', {
+            font: '8px Arial',
+            fill: '#ffffff',
+            backgroundColor: '#000000',
+            wordWrap: {
+                width: 200,  // Adjust the width to your preference
+            },
+            padding: {
+                x: 4,  // Adjust the padding as needed
+                y: 4,
+            },
+            align: 'center', // Align the text to the left
+        });
+        
+        this.textBox.setOrigin(0.5);
+        this.textBox.setVisible(false);
 
 
         // set up player avatar
@@ -147,6 +171,8 @@ class Platformer extends Phaser.Scene {
         this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.rKey = this.input.keyboard.addKey('R');
         this.reloadKey = this.input.keyboard.addKey('F'); // Add reload key
+        this.eKey = this.input.keyboard.addKey('E');
+        this.hKey = this.input.keyboard.addKey('H');
 
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-D', () => {
@@ -271,6 +297,17 @@ class Platformer extends Phaser.Scene {
             
         }
 
+        if (this.eKey.isDown) {
+            this.textBox.setVisible(true);
+            this.eButtonPrompt.setVisible(false);
+        } 
+
+        if (Phaser.Input.Keyboard.JustDown(this.hKey)) {
+            this.textBox.setVisible(false);
+            this.eButtonPrompt.setVisible(true);
+        }    
+        
+
         // Update bullets
         this.bullets.children.each(function (bullet) {
             if (bullet.active && (bullet.x > this.physics.world.bounds.width || bullet.x < 0)) {
@@ -303,20 +340,6 @@ class Platformer extends Phaser.Scene {
         const textPositionY = camera.worldView.y; // 10 pixels from the top edge of the camera's visible area
         this.bulletText.setPosition(textPositionX, textPositionY);
         this.healthText.setPosition(textPositionX, textPositionY + 20);
-    }
-
-   
-
-    handleVictory() {
-        my.sprite.player.setVelocity(0);
-        my.sprite.player.anims.stop();
-
-        const victoryText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'Victory!', {
-            font: '48px Arial',
-            fill: '#ffffff'
-        });
-
-        this.input.keyboard.enabled = false;
     }
 
     spawnBEE(x, y) {
