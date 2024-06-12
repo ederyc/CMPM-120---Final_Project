@@ -77,12 +77,24 @@ class Platformer extends Phaser.Scene {
 
         this.bees = this.physics.add.group();
 
+        this.burgers = this.map.createFromObjects("Objects", {
+            name: "Burger",
+            key: "tilemap_sheet",
+            frame: 90
+        });
+
         // TODO: Add turn into Arcade Physics here
         // Since createFromObjects returns an array of regular Sprites, we need to convert 
         // them into Arcade Physics sprites (STATIC_BODY, so they don't move) 
 
+
+
         // Create a Phaser group out of the array this.coins
         // This will be used for collision detection below.
+
+         // Handle collision detection with coins
+
+
 
         // Bullet group
         this.bullets = this.physics.add.group({
@@ -124,10 +136,7 @@ class Platformer extends Phaser.Scene {
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
-        // TODO: Add coin collision handler
-        // Handle collision detection with coins
- 
-
+        this.physics.add.overlap(this.bullets, this.bees, this.beeHitByBullet, null, this);
 
 
         //handle collisions between bullets and bees
@@ -148,12 +157,20 @@ class Platformer extends Phaser.Scene {
         // TODO: Add movement vfx here
         // movement vfx
         my.vfx.walking = this.add.particles(0, 0, "kenny-particles", {
-            frame: ['smoke_01.png', 'smoke_08.png'],
-            scale: {start: 0.03, end: 0.1},
-            lifespan: 350,
+            frame: ['dirt_01.png', 'dirt_03.png'],
+            scale: {start: 0.001, end: 0.06},
+            lifespan: 200,
             alpha: {start: 1, end: 0.1},
         });
         my.vfx.walking.stop();
+
+        my.vfx.jumping = this.add.particles(0, 0, "kenny-particles", {
+            frame: ['muzzle_01.png', 'muzzle_02.png'],
+            scale: {start: 0.001, end: 0.06},
+            lifespan: 200,
+            alpha: {start: 1, end: 0.1},
+        });
+        my.vfx.jumping.stop();
 
         // Initial shot sprite
         this.initialShot = this.add.sprite(0, 0, 'initial_shot');
@@ -320,6 +337,9 @@ class Platformer extends Phaser.Scene {
         player.setVelocityX(knockbackDirection * 300);
         player.setVelocityY(-200);
 
+        bee.setVelocityX(0);
+        bee.setVelocityY(0);
+
         this.tweens.add({
             targets: player,
             alpha: 0,
@@ -331,17 +351,34 @@ class Platformer extends Phaser.Scene {
                 player.alpha = 1;
             }
         });
-        
+
         if (this.playerHealth <= 0) {
             this.gameOver();
         }
     }
 
     beeHitByBullet(bullet, bee) {
-        bullet.setActive(false);
-        bullet.setVisible(false);
-        bee.destroy();
-        console.log('Bee hit by bullet!');
+        bullet.destroy();
+
+        let knockbackDirection = bullet.x < bee.x ? 1 : -1;
+
+        bee.setVelocityX(knockbackDirection * 50);
+        bee.setVelocityY(-100);
+
+        bee.setVelocityY(0);
+        
+
+        this.tweens.add({
+            targets: bee,
+            alpha: 0,
+            duration: 50,
+            ease: 'Linear',
+            yoyo: true,
+            repeat: 5,
+            onComplete: () => {
+                bee.destroy();
+            }
+        });
     }
 
 
