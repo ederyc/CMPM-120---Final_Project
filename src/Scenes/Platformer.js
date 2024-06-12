@@ -19,6 +19,7 @@ class Platformer extends Phaser.Scene {
         this.BEE_MOVEMENT_RANGE = 20; // Range in pixels above and below the spawn point
         this.playerHeatlh = 100;
         this.lastStepTime = 0; //track the time of the last step
+        this.gameOverFlag = false;
 
 
         // Define bee spawn positions
@@ -120,7 +121,7 @@ class Platformer extends Phaser.Scene {
         this.tweens.add({
             targets: this.eButtonPrompt,
             scale: 1.8, // Scale factor for pulsation
-            duration: 250, // Duration for scaling up
+            duration: 200, // Duration for scaling up
             yoyo: true, // Play the tween in reverse (scaling down)
             repeat: -1 // Repeat indefinitely
         });
@@ -165,6 +166,21 @@ class Platformer extends Phaser.Scene {
 
         //handle collisions between bullets and bees
         this.physics.add.collider(my.sprite.player, this.bees, this.playerHitByBee, null, this);
+
+        this.burgers = this.physics.add.group();
+
+        const burgerPositions = [
+            { x: 150, y: 300 },
+            { x: 400, y: 200 },
+            { x: 600, y: 250 },
+        ]
+
+        burgerPositions.forEach(pos => {
+            let burger = this.burgers.create(pos.x, pos.y, 'burger');
+            burger.body.allowGravity = false;
+        });
+
+        this.physics.add.overlap(my.sprite.player, this.burgers, this.collectBurger, null, this);
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -330,9 +346,16 @@ class Platformer extends Phaser.Scene {
             }
         }, this);
 
-        if (this.playerHealth <= 0) {
+
+        if (this.playerHeatlh <= 0 && !this.gameOverFlag) {
             this.gameOver();
         }
+
+        if (my.sprite.player.y > this.physics.world.bounds.height - 500) {
+            this.gameOver();
+            return;
+        }
+        
 
         // Update bullet text position with camera
         const camera = this.cameras.main;
@@ -351,8 +374,17 @@ class Platformer extends Phaser.Scene {
         bee.maxY = y + this.BEE_MOVEMENT_RANGE;
     }
 
+    collectBurger(player, burger) {
+        burger.destroy();
+        this.playerHeatlh += 10;
+        if (this.playerHeatlh > 100) {
+            this.playerHeatlh = 100;
+        }
+        this.healthText.setText(`HEALTH: ${this.playerHeatlh}`);
+    }
+
     playerHitByBee(player, bee) {
-        this.playerHeatlh -= 20;
+        this.playerHeatlh -= 50;
         this.updateHealthText();
 
         let knockbackDirection = player.x < bee.x ? -1 : 1;
@@ -375,9 +407,7 @@ class Platformer extends Phaser.Scene {
             }
         });
 
-        if (this.playerHealth <= 0) {
-            this.gameOver();
-        }
+       
     }
 
     beeHitByBullet(bullet, bee) {
@@ -457,6 +487,31 @@ class Platformer extends Phaser.Scene {
     }
 
     gameOver() {
-        this.scene.start("gameOverScene")
+        this.gameOverFlag = true;
+        // Create a big text box in the middle of the screen
+        const camera = this.cameras.main;
+        const centerX = camera.worldView.x + camera.worldView.width / 2;
+        const centerY = camera.worldView.y + camera.worldView.height / 2;
+        const gameOverText = this.add.text(centerX, centerY, 'GAME OVER', {
+            fontSize: '64px',
+            fill: '#ff0000',
+            backgroundColor: '#000000'
+        }).setOrigin(0.5);
+
+
+    
+        // Stop player movement
+        my.sprite.player.setVelocity(0);
+        my.sprite.player.setAcceleration(0);
+        my.sprite.player.anims.play('idle');
+        my.sprite.player.setVisible(false);
+        my.sprite.player.body.enable = false;
+        // Stop player controls
+        this.input.keyboard.removeAllListeners();
+        my.sprite.player.body.moves = false;
     }
+
+
+
+   
 }
