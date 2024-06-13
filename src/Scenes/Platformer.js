@@ -5,10 +5,10 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
-        this.ACCELERATION = 500;
-        this.DRAG = 1000;    // DRAG < ACCELERATION = icy slide
-        this.physics.world.gravity.y = 1300;
-        this.JUMP_VELOCITY = -600;
+        this.ACCELERATION = 400;
+        this.DRAG = 1200;    // DRAG < ACCELERATION = icy slide
+        this.physics.world.gravity.y = 1000;
+        this.JUMP_VELOCITY = -490;
         this.PARTICLE_VELOCITY = 50;
         this.SCALE = 2.0;
         this.BULLET_SPEED = 600;
@@ -16,18 +16,38 @@ class Platformer extends Phaser.Scene {
         this.RELOAD_TIME = 2000; // Reload time in milliseconds
         this.isReloading = false; // Track if reloading is in progress
         this.BEE_SPEED = 200;
-        this.BEE_MOVEMENT_RANGE = 20; // Range in pixels above and below the spawn point
+        this.BEE_MOVEMENT_RANGE = 10; // Range in pixels above and below the spawn point
         this.playerHeatlh = 100;
         this.lastStepTime = 0; //track the time of the last step
         this.gameOverFlag = false;
+        this.MAX_HEALTH = 100;
 
 
         // Define bee spawn positions
         this.BEE_SPAWN_POSITIONS = [
-            { x: 500, y: 200 },
-            { x: 540, y: 190 },
-            { x: 900, y: 150 },
-            { x: 800, y: 150 },
+            { x: 660, y: 260 },
+            { x: 690, y: 230 },
+            { x: 730, y: 260 },
+            { x: 250, y: 290 },
+            { x: 274, y: 250 },
+            { x: 304, y: 290 },
+            { x: 324, y: 250 },
+            { x: 344, y: 290 },
+            { x: 324, y: 130 },
+            { x: 550, y: 40 },
+            { x: 1000, y: 220 },
+            { x: 1200, y: 250 },
+            { x: 1100, y: 200 },
+            { x: 1190, y: 140 },
+            { x: 1400, y: 30 },
+            { x: 1300, y: 200 },
+            { x: 1300, y: 60 },
+            { x: 1240, y: 80 },
+            { x: 1100, y: 60 },
+            { x: 1040, y: 60 },
+
+
+
 
             // Add more positions as needed
         ];
@@ -74,8 +94,6 @@ class Platformer extends Phaser.Scene {
 
         
 
-
-
         this.bees = this.physics.add.group();
 
         this.burgers = this.map.createFromObjects("Objects", {
@@ -93,18 +111,48 @@ class Platformer extends Phaser.Scene {
             }
         });
 
+        this.backgroundMusic = this.sound.add('music');
+
+        if (!this.backgroundMusic.isPlaying) {
+        this.backgroundMusic.play({
+            loop:true
+        });
+    }
+
         this.snowman = this.physics.add.sprite(100, 250, 'snowman');
-    this.snowman.setInteractive();
-    this.physics.add.collider(this.snowman, this.groundLayer);
+        this.snowman.setInteractive();
+        this.snowman.setCollideWorldBounds(true);
+        this.physics.add.collider(this.bullets, this.snowman, this.bulletHitSnowman, null, this);
+        this.physics.add.collider(this.snowman, this.groundLayer);
+
+        this.sushi = this.physics.add.sprite(27, 24, 'sushi');
+        this.sushi.body.allowGravity = false; // Disable gravity for the sushi
+        this.sushi.setImmovable(true); // Make the sushi immovable
+
+        this.tweens.add({
+            targets: this.sushi,
+            scale: 1.2, // Scale factor for pulsation
+            duration: 200, // Duration for scaling up
+            yoyo: true, // Play the tween in reverse (scaling down)
+            repeat: -1 // Repeat indefinitely
+        });
+
+
 
         // Set the initial bullets left value
         this.bulletsLeft = this.MAX_BULLETS;
+        //1530, 36
 
+        this.donut = this.physics.add.sprite(1500, 36, 'donut');
+        this.donut.body.allowGravity = false; // Disable gravity for the donut
+        this.donut.setImmovable(true); // Make the donut immovable
+
+        
    
 
         // Create the text object for bullets left
         this.bulletText = this.add.text(0, 0, `BULLETS X ${this.bulletsLeft}`, {
-            font: '18px Arial',
+            font: '18px hey',
             fill: '#ffffff'
         });
 
@@ -129,7 +177,7 @@ class Platformer extends Phaser.Scene {
 
 
         this.textBox = this.add.text(this.snowman.x, this.snowman.y - 20, 'Get to the birthday Cake!\nMove with the arrow keys\nPress SPACE to shoot\nPress F to reload\nPress R to restart\nCollect BURGERS to regain health\nOther types of food grant power-ups\nPress H to hide this message', {
-            font: '8px Arial',
+            font: '8px',
             fill: '#ffffff',
             backgroundColor: '#000000',
             wordWrap: {
@@ -170,9 +218,9 @@ class Platformer extends Phaser.Scene {
         this.burgers = this.physics.add.group();
 
         const burgerPositions = [
-            { x: 150, y: 300 },
-            { x: 400, y: 200 },
-            { x: 600, y: 250 },
+            { x: 170, y: 180 },
+            { x: 510, y: 220 },
+            { x: 1070, y: 50 },
         ]
 
         burgerPositions.forEach(pos => {
@@ -220,8 +268,8 @@ class Platformer extends Phaser.Scene {
 
         // TODO: add camera code here
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-        this.cameras.main.startFollow(my.sprite.player, true, 0.9, 0.9); // (target, [,roundPixels][,lerpX][,lerpY])
-        this.cameras.main.setDeadzone(50, 50);
+        this.cameras.main.startFollow(my.sprite.player, true, 1, 1); // (target, [,roundPixels][,lerpX][,lerpY])
+        this.cameras.main.setDeadzone(25, 1);
         this.cameras.main.setZoom(this.SCALE);
 
         // Disable gravity for bullets
@@ -287,13 +335,17 @@ class Platformer extends Phaser.Scene {
         if (my.sprite.player.body.blocked.down && Phaser.Input.Keyboard.JustDown(cursors.up)) {
             my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             this.sound.play("jump", {
-                volume: 0.7
+                volume: 0.4
             });
         }
 
 
         if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
             this.scene.restart();
+            this.backgroundMusic.stop();
+            this.gameOverFlag = false;
+            this.gameOverSoundPlayed = false;
+
         }
 
         // Reload mechanic
@@ -336,6 +388,7 @@ class Platformer extends Phaser.Scene {
             if (bee && bee.active) {
                 bee.setVelocityY(this.BEE_SPEED * bee.direction.y);
 
+
                 if (bee.y < bee.minY) {
                     bee.y = bee.minY;
                     bee.direction.y = 1;
@@ -353,8 +406,14 @@ class Platformer extends Phaser.Scene {
 
         if (my.sprite.player.y > this.physics.world.bounds.height - 500) {
             this.gameOver();
+
             return;
         }
+
+        this.physics.overlap(my.sprite.player, this.donut, this.collectDonut, null, this);
+        this.physics.overlap(my.sprite.player, this.sushi, this.collectSushi, null, this);
+
+
         
 
         // Update bullet text position with camera
@@ -375,16 +434,26 @@ class Platformer extends Phaser.Scene {
     }
 
     collectBurger(player, burger) {
+        this.sound.play("eating");
         burger.destroy();
         this.playerHeatlh += 10;
-        if (this.playerHeatlh > 100) {
-            this.playerHeatlh = 100;
+        if (this.playerHeatlh > this.MAX_HEALTH) {
+            this.playerHeatlh = this.MAX_HEALTH;
         }
         this.healthText.setText(`HEALTH: ${this.playerHeatlh}`);
     }
 
+    collectSushi(player, sushi) {
+        sushi.destroy();
+        this.sound.play("powerup");
+        this.MAX_BULLETS = 20;
+        this.bulletsLeft = this.MAX_BULLETS;
+        this.updateBulletText();
+    }
+
     playerHitByBee(player, bee) {
-        this.playerHeatlh -= 50;
+        this.sound.play("damage");
+        this.playerHeatlh -= 10;
         this.updateHealthText();
 
         let knockbackDirection = player.x < bee.x ? -1 : 1;
@@ -410,7 +479,12 @@ class Platformer extends Phaser.Scene {
        
     }
 
+
+
     beeHitByBullet(bullet, bee) {
+        this.sound.play("hit", {
+            volume: 4
+        });
         bullet.destroy();
 
         let knockbackDirection = bullet.x < bee.x ? 1 : -1;
@@ -433,6 +507,48 @@ class Platformer extends Phaser.Scene {
             }
         });
     }
+
+    bulletHitSnowman(bullet, snowman) {
+        snowman.destroy();
+        bullet.destroy();
+        this.sound.play("gasp", {
+            volume: 3
+        });
+        this.sound.play("grunt");
+    }
+
+    // Function to handle donut collection
+collectDonut() {
+    // Remove the donut sprite
+    this.donut.destroy();
+    
+    // Call the win function
+    this.winGame();
+}
+
+// Function to handle winning the game
+winGame() {
+    this.sound.play('victory', {
+        volume: 0.5
+    });
+    this.sound.play('win', {
+        volume: 2
+    });
+    // Display win message
+    const camera = this.cameras.main;
+    const centerX = camera.worldView.x + camera.worldView.width / 2;
+    const centerY = camera.worldView.y + camera.worldView.height / 2;
+    const winText = this.add.text(centerX, centerY, 'VICTORY!', {
+        fontSize: '64px',
+        fill: '#00ff00',
+        backgroundColor: '#000000'
+    }).setOrigin(0.5);
+
+    // Stop player movement
+
+    // Stop player controls
+  
+}
 
 
 
@@ -487,13 +603,13 @@ class Platformer extends Phaser.Scene {
     }
 
     gameOver() {
-        this.gameOverFlag = true;
+   
         // Create a big text box in the middle of the screen
         const camera = this.cameras.main;
         const centerX = camera.worldView.x + camera.worldView.width / 2;
         const centerY = camera.worldView.y + camera.worldView.height / 2;
-        const gameOverText = this.add.text(centerX, centerY, 'GAME OVER', {
-            fontSize: '64px',
+        const gameOverText = this.add.text(centerX, centerY, '     GAME OVER\nPress R to Restart', {
+            fontSize: '32px',
             fill: '#ff0000',
             backgroundColor: '#000000'
         }).setOrigin(0.5);

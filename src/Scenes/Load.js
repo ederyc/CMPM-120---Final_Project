@@ -11,14 +11,26 @@ class Load extends Phaser.Scene {
 
         // Load tilemap information
         this.load.audio("jump", "cartoon_jump.wav");
+        this.load.audio("victory", "victory!.mp3");
+        this.load.audio("gasp", "gasp.wav");
+        this.load.audio("grunt", "grunt.wav");
+        this.load.audio("defeat", "defeat.wav");
+        this.load.audio("hit", "fly_hit.mp3");
+        this.load.audio("eating", "eating.wav");
+        this.load.audio("powerup", "powerup.wav")
+        this.load.audio("damage", "damage.wav");
         this.load.audio("step", "walk.mp3");
         this.load.audio("shoot", "friendly_shoot.wav");
+        this.load.audio("win", "win.ogg");
+        this.load.audio("music", "high_idle.wav")
         this.load.audio("reload", "reload.mp3");
         this.load.image("initial_bee", "tile_0051.png");
         this.load.image("burger", "tile_0092.png");
         this.load.image("eButton", "tile_0087.png")
         this.load.image("snowman", "tile_0145.png")
+        this.load.image("sushi", "sushi.png")
         this.load.image("flying_bee", "tile_0052.png");
+        this.load.image("donut", "tile_0014.png")
         this.load.image("initial_shot", "tile_0043.png");
         this.load.image("bullet", "tile_0044.png")
         this.load.image("idle_walk", "tile_0040.png");
